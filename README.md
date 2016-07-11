@@ -1,3 +1,11 @@
 # MaxwellUtils
 
-[![Build Status](https://travis-ci.org/Pbellive/MaxwellUtils.jl.svg?branch=master)](https://travis-ci.org/Pbellive/MaxwellUtils.jl)
+Utilities for setting up electromagnetic simulations in the jInv framework.
+
+#Installation
+
+Type `Pkg.clone("git@github.com:JuliaInv/MaxwellUtils.git")` from the julia prompt to install.
+
+# Dependencies
+
+jInv
