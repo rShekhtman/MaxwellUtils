@@ -26,7 +26,7 @@ include("testReadData.jl")
 #sub2ind = sub2indFast
 #ind2sub = ind2subFast
 
-datafile = ["data.txt"]
+datafile = ["testFileForE3DFormat.txt"]
 topofile = "topo.txt"
 
 n     = vec([ 128  64  64 ])  # # of cells
