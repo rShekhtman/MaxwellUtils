@@ -5,7 +5,7 @@ export ShepardsInterpolation
 
 #const topogridlib = "E:\\shekht\\repository\\triangulation\\x64\\Release\\topo_grid"
 
-function readTopo( topofile::ASCIIString,  # topo file name
+function readTopo( topofile::String,  # topo file name
                    nxy::Vector{Int64},     #  # of cells in the grid
                    xy0::Vector{Float64},   # corner location on the grid
                    dxy::Vector{Float64} )  # cell size

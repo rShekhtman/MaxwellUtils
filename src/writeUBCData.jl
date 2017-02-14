@@ -1,6 +1,6 @@
 export write_datafile, write_data
 
-function write_datafile( trx::Array{Transmitter,1}, datafile::ASCIIString, only_loc::Bool )
+function write_datafile( trx::Array{Transmitter,1}, datafile::String, only_loc::Bool )
 	
 	const ignore = "*"
     const ndataline = 12     # # of data per line: real and imag (Ex Ey Ez Hx Hy Hz)
@@ -71,7 +71,7 @@ function write_datafile( trx::Array{Transmitter,1}, datafile::ASCIIString, only_
 	
 end # write_datafile
 
-function write_data( trx::Array{Transmitter,1}, datafile::ASCIIString )
+function write_data( trx::Array{Transmitter,1}, datafile::String )
 	
     const ndataline = 12     # # of data per line: real and imag (Ex Ey Ez Hx Hy Hz)
 	

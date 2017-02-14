@@ -1,8 +1,8 @@
 export setupMeshParam, getDataExtent
 
 function setupMeshParam(
-                datafile::Vector{ASCIIString},  # should be 1 or 4 input files
-                topofile::ASCIIString,  # topo file name
+                datafile::Vector{String},  # should be 1 or 4 input files
+                topofile::String,  # topo file name
                 n::Vector{Int64},       # number of underlying cells
                 x0::Vector{Float64},    # corner coordinates
                 meshL::Vector{Float64}  # mesh lengths

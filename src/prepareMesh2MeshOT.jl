@@ -14,16 +14,16 @@ function prepareMesh2MeshOT(pF::ForwardProbType, Minv::OcTreeMesh, N::Integer, c
 end
 
 
-function prepareMesh2MeshOT(pFor::RemoteRef{Channel{Any}}, MinvRef::RemoteRef{Channel{Any}}, N::Integer, compact::Bool=true)
+function prepareMesh2MeshOT(pFor::RemoteChannel, MinvRef::Future, N::Integer, compact::Bool=true)
 	pF   = fetch(pFor)
 	Minv = fetch(MinvRef)
 	return prepareMesh2MeshOT(pF, Minv, N, compact)
 end
 
 
-function prepareMesh2MeshOT(pFor::Array{RemoteRef{Channel{Any}}},Minv::OcTreeMesh,N::Integer,compact::Bool=true)
+function prepareMesh2MeshOT(pFor::Array{RemoteChannel},Minv::OcTreeMesh,N::Integer,compact::Bool=true)
 
-	Mesh2Mesh = Array(RemoteRef{Channel{Any}},length(pFor))
+	Mesh2Mesh = Array(RemoteChannel,length(pFor))
 
 	# find out which workers are involved
 	workerList = []
@@ -32,13 +32,13 @@ function prepareMesh2MeshOT(pFor::Array{RemoteRef{Channel{Any}}},Minv::OcTreeMes
 	end
 	workerList = unique(workerList)
 	# send sigma to all workers
-	MinvRef = Array(RemoteRef{Channel{Any}},maximum(workers()))
+	MinvRef = Array(Future,maximum(workers()))
 	
 	tic()
 	@sync begin
 		for p=workerList
 			@async begin
-				MinvRef[p] = remotecall_wait(p,identity,Minv)   # send model to workers
+				MinvRef[p] = remotecall_wait(identity,p,Minv)   # send model to workers
 			end
 		end
 	end
@@ -50,7 +50,7 @@ function prepareMesh2MeshOT(pFor::Array{RemoteRef{Channel{Any}}},Minv::OcTreeMes
 			@async begin
 				for idx=1:length(pFor)
 					if p==pFor[idx].where
-						Mesh2Mesh[idx] = remotecall_wait(p,prepareMesh2MeshOT,pFor[idx],MinvRef[p],N,compact)
+						Mesh2Mesh[idx] = remotecall_wait(prepareMesh2MeshOT,p,pFor[idx],MinvRef[p],N,compact)
 					end
 				end
 			end
