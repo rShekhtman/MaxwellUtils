@@ -22,7 +22,7 @@ function readTopo( topofile::String,  # topo file name
    	error("Need more topo points.")
    end
 
-   topoloc = Array(Float64, ntp,3)
+   topoloc = Array{Float64}(ntp, 3)
 
 
    for ipt = 1:ntp
@@ -50,18 +50,8 @@ function readTopo( topofile::String,  # topo file name
          (topoloc[:,2] .>= y1) & (topoloc[:,2] .<= y2) )
    topoloc = topoloc[f,:]
 
-
-
-   #topogrid = Array(Float64, nxy[1],nxy[2])
-
-	#ccall( (:get_topo_grid_, topogridlib),
-	#		Int64, (Ptr{Int64}, Ptr{Float64},  Ptr{Int64},  Ptr{Float64}, Ptr{Float64},  Ptr{Float64} ),
-	#					&ntp,      topoloc,       nxy,         xy0,          dxy,           topogrid)
-
-	#xx, yy = meshgrid(xy0[1]+[dxy[1]/2:dxy[1]:nxy[1]*dxy[1];],
-	#                  xy0[2]+[dxy[2]/2:dxy[2]:nxy[2]*dxy[2];])
-	yy, xx = meshgrid(xy0[2]+[dxy[2]/2:dxy[2]:nxy[2]*dxy[2];],
-	                  xy0[1]+[dxy[1]/2:dxy[1]:nxy[1]*dxy[1];])
+   yy, xx = meshgrid(xy0[2]+[dxy[2]/2:dxy[2]:nxy[2]*dxy[2];],
+                     xy0[1]+[dxy[1]/2:dxy[1]:nxy[1]*dxy[1];])
 
    topogrid = ShepardsInterpolation(topoloc[:,1],topoloc[:,2],topoloc[:,3],vec(xx),vec(yy))
 	topogrid = reshape(topogrid,nxy[1],nxy[2])
@@ -75,11 +65,11 @@ end  # function readTopo
 #-------------------------------------------------------------------
 
 function getItopo(
-				h::Vector{Float64},  # (3) underlying cell size
-				n::Vector{Int64},    # number of underlying cells
-				x0::Vector{Float64}, # corner coordinates
-				topogrid::Array{Float64,2}
-						)
+            h::Vector{Float64},  # (3) underlying cell size
+            n::Vector{Int64},    # number of underlying cells
+            x0::Vector{Float64}, # corner coordinates
+            topogrid::Array{Float64,2}
+                  )
 # Figure out the number of surface cells for each point in
 # the x,y grid.
 
@@ -88,7 +78,7 @@ function getItopo(
 	   error("topogrid,1) != n[1] ...")
 	end
 	
-   itopo = Array(Int64, n[1],n[2])
+   itopo = Array{Int64}(n[1], n[2])
    const z0 = x0[3]  # bottom of the mesh
    const dz = h[3]
    const nz = n[3]
@@ -106,6 +96,32 @@ function getItopo(
    return itopo	
 end  # function getItopo
 
+#-------------------------------------------------------------------
+
+function getItopo(
+            h::Vector{Float64},  # (3) underlying cell size
+            n::Vector{Int64},    # number of underlying cells
+            x0::Vector{Float64}, # corner coordinates
+            topovalue::Float64   # constant topography
+                  )
+# Figure out the number of surface cells for each point in
+# the x,y grid.
+
+   
+   itopo = Array{Int64}(n[1], n[2])
+   const z0 = x0[3]  # bottom of the mesh
+   const dz = h[3]
+   const nz = n[3]
+
+   itp = round((topovalue - z0) / dz)
+   itp = min( itp, nz )
+   itp = max( itp, 1 )
+   fill!(itopo, itp)
+
+   return itopo
+end  # function getItopo
+
+#-------------------------------------------------------------------
 
 # Shephard's interpolation with fixed exponent p = 4
 function ShepardsInterpolation(x::Vector{Float64}, y::Vector{Float64}, u::Vector{Float64},  # topography

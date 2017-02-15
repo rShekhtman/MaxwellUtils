@@ -1,5 +1,6 @@
 
-export setupBigOctreeMeshPolygon, findActiveCells!, findActiveCells_CellCentre
+export setupBigOctreeMeshPolygon, setupBigOctreeMeshPolygonWithRecs,
+       findActiveCells!, findActiveCells_CellCentre
 
 
 function setupBigOctreeMeshPolygon(
@@ -60,6 +61,82 @@ end
 
 return M
 end # function setupBigOctreeMeshPolygon
+
+#------------------------------------------------------------------------
+
+function setupBigOctreeMeshPolygonWithRecs(
+               trx::Array{TransmitterOmega},
+               nsmallcells::Vector{Int64},    # # of small cells around each point.
+               h::Vector{Float64},          # (3) underlying cell size
+               n::Vector{Int64},            # number of underlying cells
+               x0::Vector{Float64},         # corner coordinates
+               itopo::Array{Int64,2},       # # of SURFACE cells
+               depth_core::Vector{Float64}, # how far to go down in core region for fwd meshes
+               mincellfactor,               # minimum cellsize below topo
+               doFV::Bool = true)
+
+xT, yT = getTrxPoints(trx)
+xR, yR = getRxPoints(trx)
+x = [xT; xR]
+y = [yT; yR]
+
+#println("in QuickHull")
+x,y = QuickHull(x, y)
+
+
+
+#LL = 100.  # distance to expand polygon
+LL = 4*maximum(h)    # distance to expand polygon
+#println("in expandPolygon")
+x,y = expandPolygon(x, y, LL )
+# x,y now contains the outer polygon.
+
+S = initializeOctree(n)
+
+mincellsize = 1
+
+nrcvpt = 0
+for itx = 1:length(trx)
+   nrcvpt += length(trx[itx].Recs)
+end  # itx
+
+rcvloc = Array{Float64}(3,nrcvpt)
+ir = 0
+for itx = 1:length(trx)
+   for ii = 1:length(trx[itx].Recs)
+      ir += 1
+      rcvloc[1,ir] = mean( trx[itx].Recs[ii][:,1] )
+      rcvloc[2,ir] = mean( trx[itx].Recs[ii][:,2] )
+      rcvloc[3,ir] = mean( trx[itx].Recs[ii][:,3] )
+   end 
+end  # itx
+rcvloc = unique(rcvloc, 2)
+
+for ii = 1:size(rcvloc,2)
+   S = putTrxRrcv( S, h,n,x0, nsmallcells, mincellsize, rcvloc[:,ii])
+end 
+
+
+#S = belowSurfBox( S, h,n,x0, x,y, itopo, depth_core, mincellfactor)
+S = belowSurf( S, h,x0, x,y, itopo, depth_core, mincellfactor)
+
+max_topo_cell = max( div(minimum(n[1:2]), 16), 4)  #  64
+S = addTopo( S, itopo, 1,n[1], 1,n[2], max_topo_cell)
+
+# Put fine cells on the surface in the region of interest.
+S = OctreeBoxPolygonTopo(S, h,x0, x,y, itopo, 1)
+
+
+S = regularizeOcTree2(S)
+
+if doFV
+   M = getOcTreeMeshFV(S, h, x0=x0)
+else
+   M = getOcTreeMeshFEM(S, h, x0=x0)
+end
+
+return M
+end # function setupBigOctreeMeshPolygonWithRecs
 
 #------------------------------------------------------------------------
 

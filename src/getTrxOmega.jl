@@ -36,7 +36,7 @@ for i = 1:ntrx
 
    Recs = getRcv( datainput[id1:id2], rcv )
 
-   Srcs = Array(Array{Float64}, 1)
+   Srcs = Array{Array{Float64}}(1)
    Srcs[1] = trx[ datainput[id1].trx_idx ].trxpts'
 
    omega = frq[ datainput[id1].frq_idx ].omega
@@ -71,7 +71,7 @@ for i = 1:ntrx
 
    Recs = getRcv( datainput[id1:id2], rcv )
 
-   Srcs = Array(Array{Float64}, 1)
+   Srcs = Array{Array{Float64}}(1)
    Srcs[1] = trx[ datainput[id1].trx_idx ].trxpts'
 
    omega = frq[ datainput[id1].frq_idx ].omega
@@ -129,7 +129,7 @@ function getRcv( datainput::Vector{datainfo}, rcv::Vector{TrxRcv} )
 
 nrcv = length(datainput)
 
-Recs = Array(Array{Float64}, nrcv)
+Recs = Array{Array{Float64}}(nrcv)
 
 for j = 1:nrcv
 
