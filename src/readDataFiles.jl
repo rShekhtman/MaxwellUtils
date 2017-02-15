@@ -32,10 +32,10 @@ end  # type datainfo
 
 #----------------------------------------------------------
 
-function readAllFiles( datafile::ASCIIString,
-                       trxfile::ASCIIString,
-                       rcvfile::ASCIIString,
-                       frqfile::ASCIIString,
+function readAllFiles( datafile::String,
+                       trxfile::String,
+                       rcvfile::String,
+                       frqfile::String,
                        only_loc::Bool )  # true to only read locations, false for data and sd
 
 trx = readTrxRcvFile(trxfile)
@@ -58,7 +58,7 @@ end # function readAllFiles
 
 #--------------------------------------------------------------
 
-function readTrxRcvFile( datafile::ASCIIString )
+function readTrxRcvFile( datafile::String )
 # Read the transmitter or receiver information into
 # an array of type TrxRcv.
 
@@ -142,7 +142,7 @@ end # function readPoints
 
 #----------------------------------------------------------
 
-function readFrqFile( frqfile::ASCIIString )
+function readFrqFile( frqfile::String )
 
    f = open(frqfile,"r")
 
@@ -195,7 +195,7 @@ end # function readFrqFile
 
 #----------------------------------------------------------
 
-function readDataFile( datafile::ASCIIString,
+function readDataFile( datafile::String,
                        only_loc::Bool )  # true to only read locations, false for data and sd
 
    f = open(datafile,"r")

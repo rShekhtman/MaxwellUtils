@@ -2,26 +2,26 @@ export rm_cmnts, read_receiver_data, read_receiver, read_transmitter, read_dataf
 
 #----------------------------------------------------------
 
-function skipcmnts(f::IOStream)
-# Skip lines that start with '!' or '#' or are empty.
-   while true
-      if eof(f)
-         return ""  # end of file reached
-      end
-
-      line = readline(f)
-      line = split(line)
-      emptyline = length(line) == 0
-      commented = !emptyline && (startswith(line[1],"!") || startswith(line[1],"#"))
-      if !emptyline && !commented
-         return line
-      end
-   end # while true
-end  # function skipcmnts
+# function skipcmnts(f::IOStream)
+# # Skip lines that start with '!' or '#' or are empty.
+#    while true
+#       if eof(f)
+#          return ""  # end of file reached
+#       end
+# 
+#       line = readline(f)
+#       line = split(line)
+#       emptyline = length(line) == 0
+#       commented = !emptyline && (startswith(line[1],"!") || startswith(line[1],"#"))
+#       if !emptyline && !commented
+#          return line
+#       end
+#    end # while true
+# end  # function skipcmnts
 
 #----------------------------------------------------------
 
-function rm_cmnts( s::ASCIIString )
+function rm_cmnts( s::String )
 # Remove comments (everything after '!')
    f = searchindex(s,"!")
    if  f > 0 
@@ -33,7 +33,7 @@ end  # rm_cmnts
 #----------------------------------------------------------
 
 function read_receiver_data( f::IOStream, nrcv::Int64,
-                             ignore::SubString{ASCIIString} )
+                             ignore::SubString{String} )
 # Read receiver locations, data and standard deviations.
 
    const ndataline = 12     # # of data per line: real and imag (Ex Ey Ez Hx Hy Hz)
@@ -70,7 +70,7 @@ end  # read_receiver_data
 #----------------------------------------------------------
 
 function read_receiver( f::IOStream, nrcv::Int64,
-                        ignore::SubString{ASCIIString} )
+                        ignore::SubString{String} )
 # Read only receiver locations (no data).
 
    rcvpts = Array(Float64, 3,nrcv)
@@ -164,7 +164,7 @@ end # function makeloop
 
 #----------------------------------------------------------
 
-function read_datafile( datafile::ASCIIString,  # data filename
+function read_datafile( datafile::String,  # data filename
                         only_loc::Bool )  # true to only read locations, false for data and sd
 
    f = open(datafile,"r")
