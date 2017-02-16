@@ -50,7 +50,7 @@ function prepareMesh2MeshOT(pFor::Array{RemoteChannel},Minv::OcTreeMesh,N::Integ
 			@async begin
 				for idx=1:length(pFor)
 					if p==pFor[idx].where
-						Mesh2Mesh[idx] = remotecall_wait(prepareMesh2MeshOT,p,pFor[idx],MinvRef[p],N,compact)
+						Mesh2Mesh[idx] = initRemoteChannel(prepareMesh2MeshOT,p,pFor[idx],MinvRef[p],N,compact)
 					end
 				end
 			end
