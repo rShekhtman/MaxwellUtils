@@ -2,7 +2,7 @@ export setupMeshParam, getDataExtent
 
 function setupMeshParam(
                 datafile::Vector{String},  # should be 1 or 4 input files
-                topofile::String,  # topo file name
+                topofile::Union{String,Float64},  # topo file name
                 n::Vector{Int64},       # number of underlying cells
                 x0::Vector{Float64},    # corner coordinates
                 meshL::Vector{Float64}  # mesh lengths
@@ -13,7 +13,7 @@ if !ispow2(n[1]) || !ispow2(n[2]) || !ispow2(n[3])
 end
    
    
-only_loc = false  # true for only locations
+only_loc = true  # true for only locations
 if length(datafile) == 1   
    trx = read_datafile( datafile[1], only_loc )  
 
@@ -33,8 +33,11 @@ x1,x2, y1,y2, z1,z2 = getDataExtent(trx)
 # smallest cell size
 h = meshL ./ n
 
-topogrid = readTopo( topofile, n, x0, h )
-
+if typeof(topofile) == String
+   topogrid = readTopo( topofile, n, x0, h )
+else
+   topogrid = topofile   # constant topography
+end
 
 mintp = minimum(topogrid)
 maxtp = maximum(topogrid)

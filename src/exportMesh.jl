@@ -22,30 +22,18 @@ x3 = x3 + m3 * h3
 S = sub2ind( (m1,m2,m3), i1,i2,i3 )
 p = sortpermFast(S)[1]
 
-
-i1  = i1[p] # S[:,3]
-i2  = i2[p] # S[:,2]
-i3  = i3[p] # S[:,1]
-bsz = bsz[p] # S[:,4]
-
 n = length(bsz)
+
 
 # Write OcTree mesh
 f = open(name, "w")
-
-# Base.@printf(f, " %4d %4d %4d ! # of cells in underlying mesh\n", m1, m2, m3)
-# Base.@printf(f, " %13.6e %13.6e %13.6e ! top corner\n", x1, x2, x3)
-# Base.@printf(f, " %13.6e %13.6e %13.6e ! cell size\n", h1, h2, h3)
-# Base.@printf(f, " %d ! size of octree mesh\n", n)
-# for i = 1:n
-# 	Base.@printf(f, " %4d %4d %4d %4d\n", i1[i], i2[i], i3[i], bsz[i])
-# end
 println(f, m1, " ", m2, " ", m3, " ! # of cells in underlying mesh")
 println(f, x1, " ", x2, " ", x3, " ! top corner")
 println(f, h1, " ", h2, " ", h3, " ! cell size")
 println(f, n, " ! size of octree mesh")
 for i = 1:n
-	println(f, i1[i], " ", i2[i], " ", i3[i], " ", bsz[i])
+   idx = p[i]
+   @printf(f,"%i %i %i %i\n", i1[idx], i2[idx], i3[idx], bsz[idx])
 end
 
 close(f)
@@ -64,15 +52,9 @@ i1,i2,i3,bsz = find3(mesh.S)
 i3 = m3 + 2 .- i3 - bsz
 
 n = nnz(mesh.S)
-#S = Array((typeof(i3[1]),typeof(i2[1]),typeof(i1[1])), n)
-#S = cell(n)
-#for i=1:n
-#	S[i] = (i3[i],i2[i],i1[i])
-#end
 
 S = sub2ind( (m1,m2,m3), i1,i2,i3 )
 
-#p = sortperm(S)
 p = sortpermFast(S)[1]
 
 v = u[p]
@@ -80,7 +62,6 @@ v = u[p]
 # Write model vector
 f = open(name, "w")
 for i = 1:n
-#	Base.@printf(f, "%.15e\n", v[i])
 	println(f, v[i])
 end
 close(f)
@@ -99,15 +80,9 @@ i1,i2,i3,bsz = find3(mesh.S)
 i3 = m3 + 2 .- i3 - bsz
 
 n = nnz(mesh.S)
-#S = Array((typeof(i1[1]),typeof(i2[1]),typeof(i3[1])), n)
-#S = cell(n)
-#for i=1:n
-#	S[i] = (i3[i],i2[i],i1[i])
-#end
 
 S = sub2ind( (m1,m2,m3), i1,i2,i3 )
 
-#p = sortperm(S)
 p = sortpermFast(S)[1]
 
 v = u[p]
@@ -115,7 +90,6 @@ v = u[p]
 # Write model vector
 f = open(name, "w")
 for i = 1:n
-#	Base.@printf(f, "%d\n", v[i])
 	println(f, v[i])
 end
 close(f)
@@ -249,34 +223,3 @@ function getNodalNumberingVTKlocal(S::SparseArray3D)
   N = sparse3(i,j,k,1:length(i), [m1+1,m2+1,m3+1]);
   return i,j,k,N
 end
-
-# function getCellNumberingVTKlocal(S::SparseArray3D)
-#   #Same as getCellNumbering function in JOcTree/getCellNumbering.jl except
-#   #that this function returns 3D indices of cells.
-#   m1,m2,m3  = S.sz
-#   i,j,k     = find3(S)
-#   return i,j,k,sparse3(i,j,k,1:length(i),[m1,m2,m3]);
-# end
-
-#-----------------------------------------------
-#
-# function addVTKdataOcTree{T<:Real}(
-#                    vtk::WriteVTK.DatasetFile,data::Array{T},dataName::AbstractString,
-#                    nn::Int64,mesh::OcTreeMesh,weights=[])
-#   ndata = length(data)
-#   nc = mesh.nc
-#   nf = sum(mesh.nf)
-#   ne = sum(mesh.ne)
-#   @assert ndata in (nn,3*nn,nc,3*nc,nf,ne) "Length of data array does not match mesh"
-#
-#   if ndata in (nn,3*nn)
-#     vtk_point_data(vtk,data,dataName)
-#   elseif ndata in (nc,3*nc)
-#     vtk_cell_data(vtk,data,dataName)
-#   elseif ndata == nf
-#     error("Face data not implemented")
-#   elseif ndata == ne
-#     error("Edge data not implemented for OcTree meshes")
-#   end
-#   return
-# end

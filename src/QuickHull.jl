@@ -152,15 +152,13 @@ hull[iC] = iQ
 hull[iP] = iC
 #npoints += 1  # total # of hull points
 
-Sk = setdiff(S, iC)
-
-S1 = get_outside_points( x,y, Sk, iP,iC )
+S1 = get_outside_points( x,y, S, iP,iC )
 FindHull!( x,y, S1, iP, iC, hull )
-S1=0
+S1=[]
 
-S2 = get_outside_points( x,y, Sk, iC,iQ )
+S2 = get_outside_points( x,y, S, iC,iQ )
 FindHull!( x,y, S2, iC, iQ, hull )
-S2=0
+S2=[]
 
 return
 end # function FindHull!
@@ -197,6 +195,7 @@ function get_outside_points( x::Vector{Float64}, y::Vector{Float64},   # all poi
                              p1::Int, p2::Int )   # indeces of points making a line segment
 
 const npts = length(S)
+tol = 1.e-10
 
 S_out = Array{Int64}(npts)
 
@@ -212,7 +211,7 @@ if x[p2] == x[p1]
    for i = 1:npts
       Si = S[i]
 
-      if scale*x[Si] < scale*x[p1]
+      if scale*(x[Si] - x[p1]) < -tol 
          nS += 1
          S_out[nS] = Si
       end
@@ -235,7 +234,7 @@ else
       # Point (x(Si),yy) is located on line through points x(p1),y(p1) to x(p2),y(p2) .
       yy = slope * (x[Si] - x[p1]) + y[p1]
 
-      if scale*y[Si] > scale*yy
+      if scale*(y[Si] - yy) > tol 
          nS += 1
          S_out[nS] = Si
       end

@@ -52,7 +52,7 @@ function putTrxRrcv(
                 n::Vector{Int64},    # number of underlying cells
                 x0::Vector{Float64}, # corner coordinates
                 nsmallcells::Vector{Int64},  #  # of small cells around each point.
-                mincellsize,         #  minimum cell size in the data area
+                mincellsize::Int64,  #  minimum cell size in the data area
                 pt::Vector{Float64}  # (x,y,z) location
                     )
 
@@ -310,7 +310,8 @@ end
 
 function addTopo(S::SparseArray3D,
                  itopo::Array{Int64,2},   # # of SURFACE cells
-                 ix1,ix2, jy1,jy2,        # indeces of cells in the region of interest
+                 ix1::Int64, ix2::Int64,  # indeces of cells in the region of interest
+                 jy1::Int64, jy2::Int64,  # indeces of cells in the region of interest
                  cellsize=1 )             # size of the smallest surface cells
     # Add fine topography in only the region of interest.
 
@@ -319,23 +320,26 @@ function addTopo(S::SparseArray3D,
         error("size(itopo,1) != S.sz[1] ...")
     end
 
-    npts = (ix2-ix1+1) * (jy2-jy1+1)
+    npts = div(ix2-ix1+1, cellsize) *
+           div(jy2-jy1+1, cellsize) + 2
 
     ii = Array{Int64}(npts)
     jj = Array{Int64}(npts)
     kk = Array{Int64}(npts)
 
-    ic = 1
-    for j = jy1:jy2
-        for i = ix1:ix2
-            ii[ic] = i
-            jj[ic] = j
-            kk[ic] = itopo[i,j]
+    hh = div(cellsize, 2)  # half cell size
+
+    ic = 0
+    for j = jy1:cellsize:jy2
+        for i = ix1:cellsize:ix2
             ic += 1
+            ii[ic] = i + hh
+            jj[ic] = j + hh
+            itp = mean( itopo[i:i+cellsize-1, j:j+cellsize-1] )
+            kk[ic] = itp - hh - 1
         end
     end
 
-    S = octreeRegion( S, ii, jj, kk, cellsize )
+    S = octreeRegion( S, ii[1:ic], jj[1:ic], kk[1:ic], cellsize )
     return S
 end
-
