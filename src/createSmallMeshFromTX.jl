@@ -336,7 +336,7 @@ function addTopo(S::SparseArray3D,
             ii[ic] = i + hh
             jj[ic] = j + hh
             itp = mean( itopo[i:i+cellsize-1, j:j+cellsize-1] )
-            kk[ic] = itp - hh - 1
+            kk[ic] = round(Int64, itp) - hh - 1
         end
     end
 
