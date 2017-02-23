@@ -13,7 +13,7 @@ if !ispow2(n[1]) || !ispow2(n[2]) || !ispow2(n[3])
 end
    
    
-only_loc = true  # true for only locations
+only_loc = false  # true for only locations
 if length(datafile) == 1   
    trx = read_datafile( datafile[1], only_loc )  
 
