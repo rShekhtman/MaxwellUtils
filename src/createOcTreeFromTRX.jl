@@ -48,7 +48,7 @@ function getOcTreeFromTRX(trx::Array{Transmitter,1},cellSize,padding,depthFine;n
 	M = getOcTreeMeshFV(S, [hx, hy, hz]; x0 = [x0, y0, z0])
 	
 	if !isempty(outFile)
-		exportOcTreeMeshRoman(outFile, M)	
+		exportUBCOcTreeMesh(outFile, M)	
 	end
 	return M
 

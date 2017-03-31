@@ -5,15 +5,15 @@ function setupMeshParam(
                 topofile::Union{String,Float64},  # topo file name
                 n::Vector{Int64},       # number of underlying cells
                 x0::Vector{Float64},    # corner coordinates
-                meshL::Vector{Float64}  # mesh lengths
-                  )  
+                meshL::Vector{Float64}; # mesh lengths
+                only_loc = false  )  # true for only locations
 
 if !ispow2(n[1]) || !ispow2(n[2]) || !ispow2(n[3]) 
     error("n should be power of 2.")
 end
    
    
-only_loc = false  # true for only locations
+#only_loc = false  # true for only locations
 if length(datafile) == 1   
    trx = read_datafile( datafile[1], only_loc )  
 

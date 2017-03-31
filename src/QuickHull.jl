@@ -211,6 +211,7 @@ if x[p2] == x[p1]
    for i = 1:npts
       Si = S[i]
 
+     # if scale*x[Si] < scale*x[p1]
       if scale*(x[Si] - x[p1]) < -tol 
          nS += 1
          S_out[nS] = Si
@@ -234,6 +235,7 @@ else
       # Point (x(Si),yy) is located on line through points x(p1),y(p1) to x(p2),y(p2) .
       yy = slope * (x[Si] - x[p1]) + y[p1]
 
+     # if scale*y[Si] > scale*yy
       if scale*(y[Si] - yy) > tol 
          nS += 1
          S_out[nS] = Si

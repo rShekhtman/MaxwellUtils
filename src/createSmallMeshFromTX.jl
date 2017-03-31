@@ -102,7 +102,7 @@ function putTrxRrcv(
     S = OctreeBox( S, ix1,ix2, iy1,iy2, iz1,iz2, mincellsize )
 
     return S
-end
+end  # function putTrxRrcv
 
 #--------------------------------------------------------
 
@@ -234,26 +234,26 @@ function cellsBelowSurf(
 
 
     if sum(depth_core) > 0
-        # Add cells below topo.
-        const dz = h[3]
+       # Add cells below topo.
+       const dz = h[3]
 
-        k1 = maximum(itopo[ix1:ix2, iy1:iy2])  # highest topo point
+       k1 = maximum(itopo[ix1:ix2, iy1:iy2])  # highest topo point
 
-        k2 = max( k1 - cld( sum(depth_core), dz), 1)
-        S = OctreeBox( S, ix1,ix2, iy1,iy2, k2,k1, mincellfactor*4 )
+       k2 = max( k1 - cld( sum(depth_core), dz), 1)
+       S = OctreeBox( S, ix1,ix2, iy1,iy2, k2,k1, mincellfactor*4 )
 
-        k2 = max( k1 - cld( sum(depth_core[1:2]), dz), 1)
-        S = OctreeBox( S, ix1,ix2, iy1,iy2, k2,k1, mincellfactor*2 )
+       k2 = max( k1 - cld( sum(depth_core[1:2]), dz), 1)
+       S = OctreeBox( S, ix1,ix2, iy1,iy2, k2,k1, mincellfactor*2 )
 
-        k2 = max( k1 - cld( depth_core[1], dz), 1)
-        S = OctreeBox( S, ix1,ix2, iy1,iy2, k2,k1, mincellfactor )
+       k2 = max( k1 - cld( depth_core[1], dz), 1)
+       S = OctreeBox( S, ix1,ix2, iy1,iy2, k2,k1, mincellfactor )
     end
 
     # Add small topo cells.
     S = addTopo( S, itopo, ix1,ix2, iy1,iy2, 1)
 
     return S
-end
+end  # function cellsBelowSurf
 
 #--------------------------------------------------------
 
@@ -277,16 +277,16 @@ function cellsBelowSurf(
     k1 = 0
     klow = n[3]  # for lowest point
     for j = 1:n[2]
-        for i = 1:n[1]
-            xx0 = x0[1] + (i-0.5)*h[1]
-            yy0 = x0[2] + (j-0.5)*h[2]
-            if insidePolygon(x,y, xx0,yy0)
-                itp = itopo[i,j]
-                k1 = max(k1,  itp + 1)
-                klow = min(klow,itp + 1)
-            end
-        end
-    end
+       for i = 1:n[1]
+          xx0 = x0[1] + (i-0.5)*h[1]
+          yy0 = x0[2] + (j-0.5)*h[2]
+          if insidePolygon(x,y, xx0,yy0)
+             itp = itopo[i,j]
+             k1 = max(k1,  itp + 1)
+             klow = min(klow,itp + 1)
+          end
+       end  # i
+    end  # j
 
     const dz = h[3]
 
@@ -304,7 +304,7 @@ function cellsBelowSurf(
     S = OctreeBoxPolygonTopo(S, h,x0, x,y, itopo, 1)
 
     return S
-end
+end  # function cellsBelowSurf
 
 #--------------------------------------------------------
 
@@ -316,12 +316,12 @@ function addTopo(S::SparseArray3D,
     # Add fine topography in only the region of interest.
 
     if size(itopo,1) != S.sz[1] ||
-        size(itopo,2) != S.sz[2]
+       size(itopo,2) != S.sz[2]
         error("size(itopo,1) != S.sz[1] ...")
     end
 
     npts = div(ix2-ix1+1, cellsize) *
-           div(jy2-jy1+1, cellsize) + 2
+           div(jy2-jy1+1, cellsize)  + 2
 
     ii = Array{Int64}(npts)
     jj = Array{Int64}(npts)
@@ -331,15 +331,16 @@ function addTopo(S::SparseArray3D,
 
     ic = 0
     for j = jy1:cellsize:jy2
-        for i = ix1:cellsize:ix2
-            ic += 1
-            ii[ic] = i + hh
-            jj[ic] = j + hh
-            itp = mean( itopo[i:i+cellsize-1, j:j+cellsize-1] )
-            kk[ic] = round(Int64, itp) - hh - 1
-        end
-    end
+       for i = ix1:cellsize:ix2
+          ic += 1
+          ii[ic] = i + hh
+          jj[ic] = j + hh
+          
+          itp = mean( itopo[i:i+cellsize-1, j:j+cellsize-1] )
+          kk[ic] = round(Int64,itp) - hh - 1
+       end
+    end  # j
 
     S = octreeRegion( S, ii[1:ic], jj[1:ic], kk[1:ic], cellsize )
     return S
-end
+end  # function addTopo
